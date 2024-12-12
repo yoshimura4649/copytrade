@@ -1,0 +1,131 @@
+@charset "UTF-8";
+/* myrole */#environments-menus .r-user #btn-new,#environments-menus .r-user .main-footer .btn-danger,#environments-menus .r-user #btn-copy,#environments-menus .r-user #btn-save,#environments-recipes .r-user #btn-new,#environments-recipes .r-user .main-footer .btn-danger,#environments-recipes .r-user #btn-copy,#environments-recipes .r-user #btn-save{display: none}{display: inline-block}#standards-moderators .r-moderator .main-footer .btn-danger,#requirements-setups .r-moderator #btn-new,#requirements-setups .r-moderator .main-footer .btn-danger,#requirements-setups .r-moderator #btn-copy{display: none}#environments-recipes .r-moderator #btn-new,#environments-recipes .r-moderator .main-footer .btn-danger,#environments-recipes .r-moderator #btn-copy,#environments-recipes .r-moderator #btn-save,#environments-materials .r-moderator #btn-new,#environments-materials .r-moderator .main-footer .btn-danger,#environments-materials .r-moderator #btn-copy,#environments-materials .r-moderator #btn-save,#standards-moderators .r-moderator #btn-new,#standards-moderators .r-moderator #btn-copy,#standards-moderators .r-moderator #btn-save,#requirements-setups .r-moderator #btn-save{display: inline-block}
+body{
+	font-family: Helvetica,'Helvetica Neue','Mplus 1p','Hiragino Kaku Gothic Pro', 'ヒラギノ角ゴ Pro W3', Meiryo, メイリオ, Osaka, 'MS PGothic'!important;
+}
+/* H1 - H6 font */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+.h1,
+.h2,
+.h3,
+.h4,
+.h5,
+.h6 {
+  font-family: Helvetica,'Helvetica Neue','Mplus 1p','Hiragino Kaku Gothic Pro', 'ヒラギノ角ゴ Pro W3', Meiryo, メイリオ, Osaka, 'MS PGothic'!important;
+}
+.main-header .logo {
+  font-family: Helvetica,'Helvetica Neue','Mplus 1p','Hiragino Kaku Gothic Pro', 'ヒラギノ角ゴ Pro W3', Meiryo, メイリオ, Osaka, 'MS PGothic'!important;
+}
+
+.layout-footer-fixed .wrapper .main-footer {
+  background-color: rgba(192,192,192, 0.8)
+}
+
+#search-form > .input-group {
+  max-width: 400px;
+  margin-right: 4px;
+}
+
+#search-form .dropdown-menu {
+  transform: translate3d(0px, 47px, 0px)!important;
+  box-shadow: 0.5rem 0.5rem 1rem rgba(0,0,0,.475);
+  width: 100%;
+  padding: 1.5rem;
+}
+
+#search-form .dropdown-menu::before {
+  border-bottom: 9px solid rgba(0, 0, 0, 0.2);
+  border-left: 9px solid rgba(0, 0, 0, 0);
+  border-right: 9px solid rgba(0, 0, 0, 0);
+  content: "";
+  display: inline-block;
+  left: 500px;
+  position: absolute;
+  top: -8px;
+}
+
+#search-form .dropdown-menu::after {
+  border-bottom: 8px solid #FFFFFF;
+  border-left: 9px solid rgba(0, 0, 0, 0);
+  border-right: 9px solid rgba(0, 0, 0, 0);
+  content: "";
+  display: inline-block;
+  left: 500px;
+  position: absolute;
+  top: -7px;
+}
+
+@media (max-width: 575.98px) {
+  #search-form .dropdown-menu::before,
+  #search-form .dropdown-menu::after {
+    left: unset;
+    right: 10%;
+  }
+
+  .btn span {
+    display: none;
+  }
+}
+
+.text-sm #search-form .input-group .form-control {
+  font-size: inherit;
+  height: unset;
+}
+
+body.copy .main-footer .btn,
+body.new .main-footer .btn {
+  display: none;
+}
+
+.main-footer #btn-list-back,
+.main-footer #btn-save {
+  display: inline-block;
+}
+
+.myupload {
+  padding: .375rem .75rem;
+  border: 2px dashed #ced4da;
+  border-radius: .25rem;
+  box-shadow: inset 0 0 0 transparent;
+  transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out;
+}
+
+.myupload p {
+  text-align: center;
+  font-size: 80%;
+}
+
+.myupload span {
+  max-width: 90%;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.myupload img {
+  display: none;
+}
+
+.myupload.img img {
+  width: 80px;
+  display: unset;
+}
+
+.myupload.img .fa-file {
+  display: none;
+}
+
+.myupload a {
+  margin: 0.5rem;
+  text-decoration: underline;
+}
+
+table .handle {
+  cursor: move;
+  white-space: nowrap;
+}

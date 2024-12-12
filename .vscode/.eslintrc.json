@@ -1,0 +1,52 @@
+{
+  "root": true,
+  "env": {
+    "node": true
+  },
+  "extends": [
+    "eslint:recommended",
+    "plugin:vue/vue3-essential",
+    "plugin:prettier/recommended"
+  ],
+  "plugins": [
+    "vue",
+    "html",
+    "prettier"
+  ],
+  "parserOptions": {
+    "ecmaVersion": "latest"
+  },
+  "rules": {
+    "prettier/prettier": 0,
+    "curly": "error",
+    "indent": [
+      0,
+      2
+    ],
+    "linebreak-style": [
+      0,
+      "unix"
+    ],
+    "quotes": [
+      0,
+      "single"
+    ],
+    "semi": [
+      0,
+      "always"
+    ],
+    "spaced-comment": [
+      "error",
+      "always",
+      {
+        "exceptions": [
+          "-",
+          "+"
+        ]
+      }
+    ]
+  },
+  "globals": {
+    "_": true
+  }
+}
