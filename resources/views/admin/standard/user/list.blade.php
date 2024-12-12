@@ -80,6 +80,7 @@
 
 <script>
   var tableConfig = {
+    buttons :[],
     columns: [{
         data: 'name',
         render: function(data, type, row, meta) {

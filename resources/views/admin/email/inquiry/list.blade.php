@@ -44,7 +44,8 @@
 
 <script>
   var tableConfig = {
-    'columns': [{
+    buttons :[],
+    columns: [{
         data: 'name',
         render: function(data, type, row, meta) {
           return '<a href="/admin/email/inquiry/detail/' + row['id'] + '">' + data + '</a>';

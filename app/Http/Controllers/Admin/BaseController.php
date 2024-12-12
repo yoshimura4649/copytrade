@@ -7,9 +7,9 @@ use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\View;
 use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\View;
 
 class BaseController extends Controller
 {
@@ -20,7 +20,7 @@ class BaseController extends Controller
     $this->middleware(function ($request, $next) {
       $auth = Auth::guard('admin');
       if (!$auth->check()) {
-        return redirect('admin/guard/login?ref=' . url()->full())->send();
+        return redirect()->route('admin.guard.login', ['ref' => $request->getRequestUri()])->send();
       }
 
       $admin = $auth->user();
@@ -28,9 +28,9 @@ class BaseController extends Controller
       $this->admin['name'] = $admin->name;
       $this->admin['group'] = $admin->group;
 
-      View::share(array(
+      View::share([
         'admin' => $this->admin,
-      ), null, false);
+      ], null, false);
 
       return $next($request);
     });
@@ -64,7 +64,7 @@ class BaseController extends Controller
   {
     if (isset($input['order'])) {
       foreach ($input['order'] as $value) {
-        $query->order_by($value['column'], $value['dir']);
+        $query->orderBy($value['column'], $value['dir']);
       }
     }
   }

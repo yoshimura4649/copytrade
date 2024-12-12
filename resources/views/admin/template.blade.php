@@ -7,7 +7,7 @@
   <meta http-equiv="x-ua-compatible" content="ie=edge">
   <link rel="icon" type="image/png" href="/assets/dist/admin/img/favicon-16x16.png">
 
-  <title><?php echo $title; ?></title>
+  <title>{{ $title }}</title>
 
   <!-- Font Awesome Icons -->
   <link rel="stylesheet" href="/assets/plugins/fontawesome-free/css/fontawesome.min.css" />
@@ -82,10 +82,10 @@
   <script defer src="/assets/dist/admin/js/base.js"></script>
 </head>
 
-<body id="<?php echo $segments[1]; ?>-<?php echo $segments[2]; ?>" class="hold-transition sidebar-mini layout-fixed layout-navbar-fixed layout-footer-fixed text-sm <?php echo $segments[3]; ?>">
+<body id="{{ $segments[1] }}-{{ $segments[2] }}" class="hold-transition sidebar-mini layout-fixed layout-navbar-fixed layout-footer-fixed text-sm {{ $segments[3] }}">
   <script>
     if (localStorage.getItem('remember.lte.pushmenu') == 'sidebar-collapse') document.body.classList.add('sidebar-collapse');
-    const storageUrl = '<?php echo trim(Storage::url('.'), '.'); ?>';
+    const storageUrl = '{{ trim(Storage::url('.'), '.') }}';
   </script>
   <div class="wrapper r-<?php // echo implode(' r-', Auth::group('Simplegroup')->get_roles());
                         ?>">
@@ -122,7 +122,7 @@
             <img src="/assets/dist/admin/img/avatar5.png" class="img-circle elevation-2" alt="User Image">
           </div>
           <div class="info">
-            <a href="#" class="d-block dropdown-toggle dropdown-icon" data-toggle="dropdown"><span class="mr-2"><?php echo $admin['name'] ?></span></a>
+            <a href="#" class="d-block dropdown-toggle dropdown-icon" data-toggle="dropdown"><span class="mr-2">{{ $admin['name'] }}</span></a>
             <div class="dropdown-menu">
               <a class="dropdown-item text-primary" href="/admin/guard/logout">ログアウト</a>
             </div>
@@ -186,7 +186,7 @@
         <div class="container-fluid">
           <div class="row mb-2">
             <div class="col-sm-6">
-              <h1 class="m-0 text-dark"><?php echo $title; ?></h1>
+              <h1 class="m-0 text-dark">{{ $title }}</h1>
             </div><!-- /.col -->
           </div><!-- /.row -->
         </div><!-- /.container-fluid -->

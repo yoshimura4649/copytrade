@@ -3,13 +3,13 @@
 namespace App\Http\Controllers\Admin\Standard;
 
 use App\Http\Controllers\Admin\BaseController;
-use Illuminate\Support\Facades\Request;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Validator;
-use Illuminate\Validation\Rule;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Str;
 use Exception;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Request;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
+use Illuminate\Validation\Rule;
 
 class UserController extends BaseController
 {
@@ -23,6 +23,9 @@ class UserController extends BaseController
       // Search
       $this->search($input, $result);
 
+      // Order
+      $this->order($input, $result);
+
       return response()->json([
         'draw' => $input['draw'],
         'recordsFiltered' => $result->count(),
@@ -30,7 +33,7 @@ class UserController extends BaseController
           ->offset($input['start'])
           ->limit(min($input['length'], 5000))
           ->orderBy('id', 'DESC')
-          ->get()
+          ->get(),
       ]);
     }
 
