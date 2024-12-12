@@ -10,29 +10,34 @@
   <title><?php echo $title; ?></title>
 
   <!-- Font Awesome Icons -->
-  <link rel="stylesheet" href="/assets/plugins/fontawesome-free/css/all.min.css">
+  <link rel="stylesheet" href="/assets/plugins/fontawesome-free/css/fontawesome.min.css" />
+  <link rel="stylesheet" href="/assets/plugins/fontawesome-free/css/regular.min.css" />
+  <link rel="stylesheet" href="/assets/plugins/fontawesome-free/css/solid.min.css" />
+
   <!-- overlayScrollbars -->
   <link rel="stylesheet" href="/assets/plugins/overlayScrollbars/css/OverlayScrollbars.min.css">
   <!-- Datetimepicker -->
   <link rel="stylesheet" href="/assets/plugins/bootstrap4-datetimepicker/css/bootstrap-datetimepicker.min.css">
+  <!--Daterangepicker -->
+  <link rel="stylesheet" href="/assets/plugins/daterangepicker/daterangepicker.css">
   <!-- Select2 -->
   <link rel="stylesheet" href="/assets/plugins/select2/css/select2.min.css">
   <link rel="stylesheet" href="/assets/plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css">
+
   <?php
   $segments = Request::segments();
   !isset($segments[3]) and $segments[3] = 'index';
   ?>
   <?php $isList = $segments[3] == 'list' || !empty($list); ?>
   <?php if ($isList) : ?>
-  <!-- DataTables -->
-  <link rel="stylesheet" href="/assets/plugins/datatables-bs4/css/dataTables.bootstrap4.min.css">
-  <link rel="stylesheet" href="/assets/plugins/datatables-responsive/css/responsive.bootstrap4.min.css">
-  <link rel="stylesheet" href="/assets/plugins/datatables-buttons/css/buttons.bootstrap4.min.css">
+    <!-- DataTables -->
+    <link rel="stylesheet" href="/assets/plugins/datatables/datatables.min.css">
   <?php endif; ?>
   <!-- Theme style -->
   <link rel="stylesheet" href="/assets/dist/admin/css/adminlte.min.css">
   <!-- summernote -->
   <link rel="stylesheet" href="/assets/plugins/summernote/summernote-bs4.css">
+
   <!-- Google Font: Source Sans Pro -->
   <link href="https://fonts.googleapis.com/earlyaccess/mplus1p.css" rel="stylesheet" />
   <link href="https://fonts.googleapis.com/earlyaccess/roundedmplus1c.css" rel="stylesheet" />
@@ -50,19 +55,17 @@
   <script defer src="/assets/plugins/moment/locale/ja.js"></script>
   <!-- Datetimepicker -->
   <script defer src="/assets/plugins/bootstrap4-datetimepicker/js/bootstrap-datetimepicker.min.js"></script>
+  <!-- Daterangepicker -->
+  <script defer src="/assets/plugins/daterangepicker/daterangepicker.js"></script>
   <!-- Select2 -->
   <script defer src="/assets/plugins/select2/js/select2.full.min.js"></script>
+  <!-- ajaxzip3 -->
+  <script src="https://ajaxzip3.github.io/ajaxzip3.js"></script>
 
-  <?php if ($isList) : ?>
-  <!-- DataTables -->
-  <script defer src="/assets/plugins/datatables/jquery.dataTables.min.js"></script>
-  <script defer src="/assets/plugins/datatables-bs4/js/dataTables.bootstrap4.min.js"></script>
-  <script defer src="/assets/plugins/datatables-responsive/js/dataTables.responsive.min.js"></script>
-  <script defer src="/assets/plugins/datatables-responsive/js/responsive.bootstrap4.min.js"></script>
-  <script defer src="/assets/plugins/datatables-buttons/js/dataTables.buttons.min.js"></script>
-  <script defer src="/assets/plugins/datatables-buttons/js/buttons.bootstrap4.min.js"></script>
-  <script defer src="/assets/plugins/datatables-buttons/js/buttons.html5.min.js"></script>
-  <?php endif; ?>
+  @if ($isList)
+    <!-- DataTables -->
+    <script defer src="/assets/plugins/datatables/datatables.min.js"></script>
+  @endif
   <!-- jquery-validation -->
   <script defer src="/assets/plugins/jquery-validation/jquery.validate.min.js"></script>
   <script defer src="/assets/plugins/jquery-validation/localization/messages_ja.min.js"></script>

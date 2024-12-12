@@ -80,7 +80,7 @@
 
 <script>
   var tableConfig = {
-    'columns': [{
+    columns: [{
         data: 'name',
         render: function(data, type, row, meta) {
           return '<a href="/admin/standard/user/detail/' + row['id'] + '">' + data + '</a>';

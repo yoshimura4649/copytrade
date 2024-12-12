@@ -4,7 +4,7 @@
 'use strict';
 let notice = sessionStorage.getItem('notice');
 if (notice !== null) {
-  showSuccess(notice == 1 ? '送信しました' : notice == 3 ? '削除しました' : '保存しました');
+  showSuccess(notice == 1 ? '送信しました。' : notice == 3 ? '削除しました。' : '保存しました。');
   sessionStorage.removeItem('notice');
 }
 
@@ -18,19 +18,36 @@ $('#nav')
   .parent()
   .addClass('menu-open');
 
-if ($.fn.dataTable) {
-  $.fn.dataTable.Buttons.defaults.dom.buttonLiner.tag = null;
-  $.fn.dataTable.Buttons.defaults.dom.button.className = 'btn btn-default btn-sm';
-  $.fn.dataTable.Buttons.defaults.dom.container.className = 'dt-buttons flex-wrap';
+if (typeof DataTable !== 'undefined') {
+  DataTable.Buttons.defaults.dom.button.liner.tag = null;
+  DataTable.Buttons.defaults.dom.button.className = 'btn btn-default btn-sm';
+  DataTable.Buttons.defaults.dom.container.className = 'dt-buttons flex-wrap';
 
   let searchForm = $('#search-form');
-  $.extend(true, $.fn.dataTable.defaults, {
-    'dom': "<'row'<'col-sm-12 col-md-6'B><'col-sm-12 col-md-6 pagination-sm'p>><'row'<'col-sm-12'tr>><'row'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7 pagination-sm'p>>",
-    'buttons': [
+  $.extend(true, DataTable.defaults, {
+    layout: {
+      topStart: 'buttons',
+      topEnd: {
+        className: 'd-flex flex-wrap align-items-center dt-layout-end',
+        features: {
+          pageLength: {},
+          info: {},
+          paging: {},
+          div: {
+            id: 'list-setting',
+            className: 'btn ml-0',
+            html: '<div class="fas fa-ellipsis-v"></div>',
+          },
+        },
+      },
+      bottomStart: null,
+      bottomEnd: null,
+    },
+    buttons: [
       {
         extend: 'csvHtml5',
         text: '<i class="fas fa-download"></i> CSVエクスポート',
-        action: function (e, dt, button, config) {
+        action: function (e, dt, button, config, cb) {
           var self = this;
           var oldStart = dt.settings()[0]._iDisplayStart;
 
@@ -41,10 +58,13 @@ if ($.fn.dataTable) {
 
             dt.one('preDraw', function (e, settings) {
               // Call the original action function
-              $.fn.dataTable.ext.buttons.csvHtml5.action.call(self, e, dt, button, config);
+              DataTable.ext.buttons.csvHtml5.action.call(self, e, dt, button, config, cb);
 
               settings._iDisplayStart = oldStart;
               data.start = oldStart;
+
+              // Reload the grid with the original page. Otherwise, API functions like table.cell(this) don't work properly.
+              setTimeout(dt.ajax.reload(), 0);
 
               // Prevent rendering of the full data to the DOM
               return false;
@@ -55,30 +75,35 @@ if ($.fn.dataTable) {
           dt.ajax.reload();
         },
         exportOptions: {
-          columns: ':visible'
-        }
+          columns: ':visible',
+        },
       },
-      // {
-      //   extend: 'collection',
-      //   text: '<i class="fas fa-upload"></i> CSVインポート',
-      //   buttons: [
-      //       { text: 'テーブルにデータがありません',   action: function () {} },
-      //       { text: '読み込み中', action: function () {} },
-      //       { text: 'CSVインポート',    action: function () {} }
-      //   ],
-      //   fade: true
-      // },
     ],
-    'pagingType': 'full_numbers',
-    'processing': true,
-    'serverSide': true,
-    'stateSave': true,
-    'ordering': false,
-    'ajax': {
+    pagingType: 'simple_numbers',
+    processing: true,
+    serverSide: true,
+    stateSave: true,
+    order: [],
+    ajax: {
       data: function (data, settings) {
         delete data.columns;
         if (data.search['regex']) {
-          data.filter = searchForm.find('form').serializeArray().reduce((o, p) => ({ ...o, [p.name]: p.value }), {});
+          data.filter = searchForm
+            .find('form')
+            .serializeArray()
+            .reduce((o, p) => {
+              const inputType = searchForm.find(`form [name="${p.name}"]`).attr('type');
+
+              if (inputType === 'checkbox') {
+                if (!o[p.name]) {
+                  o[p.name] = [];
+                }
+                o[p.name].push(p.value);
+              } else {
+                o[p.name] = p.value;
+              }
+              return o;
+            }, {});
         }
 
         $.each(data.order, function (key, value) {
@@ -90,53 +115,92 @@ if ($.fn.dataTable) {
       error: function (jqXHR, textStatus, errorThrown) {
         // reload if error.
         // location.reload();
-      }
+      },
     },
-    'stateSaveParams': function (settings, data) {
-      data.filter = searchForm.find('form').serializeArray().reduce((o, p) => ({ ...o, [p.name]: p.value }), {});
+    stateSaveParams: function (settings, data) {
+      data.filter = searchForm
+        .find('form')
+        .serializeArray()
+        .reduce((o, p) => {
+          const inputType = searchForm.find(`form [name="${p.name}"]`).attr('type');
+
+          if (inputType === 'checkbox') {
+            if (!o[p.name]) {
+              o[p.name] = [];
+            }
+            o[p.name].push(p.value);
+          } else {
+            o[p.name] = p.value;
+          }
+          return o;
+        }, {});
     },
-    'stateLoadParams': function (settings, data) {
+    stateLoadParams: function (settings, data) {
       if (data.search['regex']) {
         searchForm.find('#search-toggle').addClass('active');
       } else if (data.search.search) {
-        searchForm
-          .find('#form-simple').val(data.search.search).end()
-          .find('#search-simple').addClass('active');
+        searchForm.find('#form-simple').val(data.search.search).end().find('#search-simple').addClass('active');
       }
       $.each(data.filter, function (key, value) {
         searchForm.find('[name=' + key + ']').val(value);
       });
     },
-    'initComplete': function (settings, json) {
+    initComplete: function (settings, json) {
       let self = this.api();
 
       let listSetting = $('#setting-modal');
       let items = '';
       $.each(settings.aoColumns, function (key, value) {
-        items += '<li class="col-6"><div class="custom-control custom-checkbox">'
-          + '<input class="custom-control-input" type="checkbox" id="setting-item' + key + '" value="' + key + '"' + (value.bVisible ? 'checked' : '') + '>'
-          + '<label for="setting-item' + key + '" class="custom-control-label">' + value.sTitle + '</label></div></li>'
+        if (value.sTitle) {
+          items +=
+            '<li class="col-6"><div class="custom-control custom-checkbox">' +
+            '<input class="custom-control-input" type="checkbox" id="setting-item' +
+            key +
+            '" value="' +
+            key +
+            '"' +
+            (value.bVisible ? 'checked' : '') +
+            '>' +
+            '<label for="setting-item' +
+            key +
+            '" class="custom-control-label">' +
+            value.sTitle +
+            '</label></div></li>';
+        }
       });
 
-      listSetting.find('#setting-item').on('change', 'input', function () {
-        let column = self.column($(this).val());
-        column.visible(!column.visible());
-      }).append(items);
+      listSetting
+        .find('#setting-item')
+        .on('change', 'input', function () {
+          let column = self.column($(this).val());
+          column.visible(!column.visible());
+        })
+        .append(items);
 
-      listSetting.find('[name="length"]').change(function () {
-        self.page.len($(this).val()).draw();
-      }).filter('#length' + self.page.len()).prop('checked', true);
+      listSetting
+        .find('[name="length"]')
+        .change(function () {
+          self.page.len($(this).val()).draw();
+        })
+        .filter('#length' + self.page.len())
+        .prop('checked', true);
 
-      searchForm.on('shown.bs.dropdown', function () {
-        searchForm.find('#form-simple, #search-simple').prop('disabled', true);
-      }).on('hidden.bs.dropdown', function () {
-        searchForm.find('#form-simple, #search-simple').prop('disabled', false);
-      }).find('#form-advanced').on('click', function (e) {
-        e.stopPropagation();
-      }).find('button').on('click', function (e) {
-        e.preventDefault();
-        searchForm.find('#search-toggle').dropdown('toggle');
-      });
+      searchForm
+        .on('shown.bs.modal', function () {
+          searchForm.find('#form-simple, #search-simple').prop('disabled', true);
+        })
+        .on('hidden.bs.modal', function () {
+          searchForm.find('#form-simple, #search-simple').prop('disabled', false);
+        })
+        .find('#form-advanced')
+        .on('click', function (e) {
+          e.stopPropagation();
+        })
+        .find('button')
+        .on('click', function (e) {
+          e.preventDefault();
+          searchForm.find('#form-advanced').modal('hide');
+        });
 
       searchForm.find('#search-simple').on('click', function (e) {
         e.preventDefault();
@@ -154,19 +218,22 @@ if ($.fn.dataTable) {
       });
 
       searchForm.find('#search-clear').on('click', function (e) {
-        self.search(searchForm.find('#form-simple').val(), false).draw();
+        self.search('', false).draw();
         searchForm.find('form')[0].reset();
         searchForm.find('#search-toggle').removeClass('active');
       });
 
       searchForm.find('#search-advanced').on('click', function (e) {
         let isAdvanced = false;
-        searchForm.find('#form-advanced').find('input, select').each(function () {
-          if ($(this).val()) {
-            isAdvanced = true;
-            return false;
-          }
-        });
+        searchForm
+          .find('#form-advanced')
+          .find('input, select')
+          .each(function () {
+            if ($(this).val()) {
+              isAdvanced = true;
+              return false;
+            }
+          });
 
         self.search('', isAdvanced).draw();
         if (isAdvanced) {
@@ -174,51 +241,48 @@ if ($.fn.dataTable) {
         } else {
           searchForm.find('#search-toggle').removeClass('active');
         }
-        searchForm
-          .find('#form-simple').val('').end()
-          .find('#search-simple').removeClass('active');
+        searchForm.find('#form-simple').val('').end().find('#search-simple').removeClass('active');
       });
     },
-    'language': {
-      'sEmptyTable': 'テーブルにデータがありません',
-      'sInfo': ' _TOTAL_ 件中 _START_ から _END_ まで表示',
-      'sInfoEmpty': ' 0 件中 0 から 0 まで表示',
-      'sInfoFiltered': '',
-      'sInfoPostFix': '',
-      'sInfoThousands': ',',
-      'sLengthMenu': '_MENU_ 件表示',
-      'sLoadingRecords': '読み込み中...',
-      'sProcessing': '処理中...',
-      'sSearch': '検索:',
-      'sZeroRecords': '一致するレコードがありません',
-      'oPaginate': {
-        'sFirst': '先頭',
-        'sLast': '最終',
-        'sNext': '次',
-        'sPrevious': '前'
+    language: {
+      sEmptyTable: 'テーブルにデータがありません',
+      sInfo: '_START_-_END_ / _TOTAL_件',
+      sInfoEmpty: '0件',
+      sInfoFiltered: '',
+      sInfoPostFix: '',
+      sInfoThousands: ',',
+      sLengthMenu: '表示件数　_MENU_',
+      sLoadingRecords: '読み込み中...',
+      sProcessing: '処理中...',
+      sSearch: '検索:',
+      sZeroRecords: '一致するレコードがありません',
+      oPaginate: {
+        sFirst: '先頭',
+        sLast: '最終',
+        sNext: '<i class="fas fa-chevron-right"></i>',
+        sPrevious: '<i class="fas fa-chevron-left"></i>',
       },
-      'oAria': {
-        'sSortAscending': ': 列を昇順に並べ替えるにはアクティブにする',
-        'sSortDescending': ': 列を降順に並べ替えるにはアクティブにする'
-      }
+      oAria: {
+        sSortAscending: ': 列を昇順に並べ替えるにはアクティブにする',
+        sSortDescending: ': 列を降順に並べ替えるにはアクティブにする',
+      },
     },
-    'responsive': true,
-    'autoWidth': false,
+    responsive: true,
+    autoWidth: false,
   });
   $('#list-table').length > 0 && $('#list-table').DataTable(tableConfig);
 }
 
 function mysummernote(wrapper) {
   wrapper.find('.mysummernote').summernote({ lang: 'ja-JP' });
-};
+}
 var nativeHtmlBuilderFunc = $.summernote.options.modules.videoDialog.prototype.createVideoNode;
-$.summernote.options.modules.videoDialog.prototype.createVideoNode =
-  function (url) {
-    // get original generate html (that has the iframe...)
-    let html = nativeHtmlBuilderFunc(url);
+$.summernote.options.modules.videoDialog.prototype.createVideoNode = function (url) {
+  // get original generate html (that has the iframe...)
+  let html = nativeHtmlBuilderFunc(url);
 
-    return html ? $('<div class="video-wrap">').append(html)[0] : html;
-  };
+  return html ? $('<div class="video-wrap">').append(html)[0] : html;
+};
 mysummernote($('body'));
 
 $.extend(true, $.fn.datetimepicker.defaults, {
@@ -231,8 +295,8 @@ $.extend(true, $.fn.datetimepicker.defaults, {
   useCurrent: false,
   icons: {
     time: 'fa fa-clock',
-    clear: 'fa fa-trash'
-  }
+    clear: 'fa fa-trash',
+  },
 });
 
 function mydatetimepicker(wrapper) {
@@ -246,10 +310,10 @@ function mydatetimepicker(wrapper) {
 
     $(this).datetimepicker({
       date: current,
-      format: 'YYYY-MM-DD HH:mm'
+      format: 'YYYY-MM-DD HH:mm',
     });
   });
-};
+}
 mydatetimepicker($('body'));
 
 function mydatepicker(wrapper) {
@@ -263,11 +327,50 @@ function mydatepicker(wrapper) {
 
     $(this).datetimepicker({
       date: current,
-      format: 'YYYY-MM-DD'
+      format: 'YYYY-MM-DD',
     });
   });
-};
+}
 mydatepicker($('body'));
+
+function mydaterangepicker(wrapper) {
+  wrapper.find('.mydaterangepicker').each(function () {
+    let self = $(this);
+    let start = self.find('.date-range-start').val();
+    if (!isNaN(start)) {
+      start = start * 1 ? moment.unix(start).format('YYYY-MM-DD') : undefined;
+    } else if (start) {
+      start = moment(start).format('YYYY-MM-DD');
+    }
+
+    let end = self.find('.date-range-end').val();
+    if (!isNaN(end)) {
+      end = end * 1 ? moment.unix(end).format('YYYY-MM-DD') : undefined;
+    } else if (end) {
+      end = moment(end).format('YYYY-MM-DD');
+    }
+
+    self.find('.date-range').daterangepicker(
+      {
+        locale: {
+          format: 'YYYY-MM-DD',
+          separator: ' ~ ',
+          applyLabel: '適用',
+          cancelLabel: 'キャンセル',
+        },
+        startDate: start,
+        endDate: end,
+        drops: 'up',
+      },
+      function (start, end, label) {
+        self.find('.date-range-start').val(start.format('YYYY-MM-DD'));
+        self.find('.date-range-end').val(end.format('YYYY-MM-DD'));
+      }
+    );
+  });
+}
+
+mydaterangepicker($('body'));
 
 // Initialize Select2 Elements
 function myselect2(wrapper) {
@@ -293,7 +396,7 @@ function myselect2(wrapper) {
     if (myselect2.data('val')) {
       $.ajax({
         url: myselect2.data('target'),
-        data: { ids: (myselect2.data('val') + '').replace(/^,+|,+$/g, '').split(',') }
+        data: { ids: (myselect2.data('val') + '').replace(/^,+|,+$/g, '').split(',') },
       }).then(function (data) {
         $.each(data.results, function (index, value) {
           let option = new Option(value.text, value.id, true, true);
@@ -302,7 +405,7 @@ function myselect2(wrapper) {
       });
     }
   });
-};
+}
 myselect2($('body'));
 
 var fileTemplate = $(`<div class="d-flex align-items-center">
@@ -348,82 +451,101 @@ function myupload(wrapper) {
         if (isImg) {
           clone.find('img').attr('src', reader.result);
         }
-        clone.find('a').attr({ 'href': reader.result, 'download': file.name }).text(file.name);
-      }
+        clone.find('a').attr({ href: reader.result, download: file.name }).text(file.name);
+      };
 
       container.find('div').remove().end().append(clone);
-    }
+    };
 
     newFile.on('change', function onChange() {
       showFile(this.files[0]);
     });
 
-    container.on('dragover', function (e) {
-      e.preventDefault();
-    }).on('dragenter', function (e) {
-      e.preventDefault();
-      container.css('background-color', '#f4f6f9');
-      dragCounter++;
-    }).on('dragleave', function (e) {
-      e.preventDefault();
-      dragCounter--;
-      if (dragCounter == 0) {
+    container
+      .on('dragover', function (e) {
+        e.preventDefault();
+      })
+      .on('dragenter', function (e) {
+        e.preventDefault();
+        container.css('background-color', '#f4f6f9');
+        dragCounter++;
+      })
+      .on('dragleave', function (e) {
+        e.preventDefault();
+        dragCounter--;
+        if (dragCounter == 0) {
+          container.css('background-color', '');
+        }
+      })
+      .on('drop', function (e) {
+        e.preventDefault();
+        showFile(e.originalEvent.dataTransfer.files[0]);
         container.css('background-color', '');
-      }
-    }).on('drop', function (e) {
-      e.preventDefault();
-      showFile(e.originalEvent.dataTransfer.files[0]);
-      container.css('background-color', '');
-      newFile[0].files = e.originalEvent.dataTransfer.files;
-      dragCounter = 0;
-    });
+        newFile[0].files = e.originalEvent.dataTransfer.files;
+        dragCounter = 0;
+      });
   });
 }
 myupload($('body'));
 
-$.validator && $.validator.setDefaults({
-  ignore: [],
-  onfocusout: false,
-  onkeyup: false,
-  onclick: false,
-  errorElement: 'span',
-  errorPlacement: function (error, element) {
-    error.addClass('invalid-feedback');
-    element.closest('.form-group').append(error);
-  },
-  highlight: function (element, errorClass, validClass) {
-    $(element).addClass('is-invalid');
-  },
-  unhighlight: function (element, errorClass, validClass) {
-    $(element).removeClass('is-invalid');
-  },
-  submitHandler: function (form) {
-    let validator = this;
-    let save = $('#btn-save');
-    save.attr('disabled', true);
-
-    $.ajax({
-      processData: false,
-      contentType: false,
-      url: form.action,
-      data: new FormData(form),
-      method: 'POST'
-    }).done(function (data) {
-      // If successful
-      if (!$.isEmptyObject(data.errors)) {
-        validator.showErrors(data.errors);
-        showError(data.errors);
+$.validator &&
+  $.validator.setDefaults({
+    ignore: [],
+    onfocusout: false,
+    onkeyup: false,
+    onclick: false,
+    errorElement: 'span',
+    errorPlacement: function (error, element) {
+      error.addClass('invalid-feedback');
+      if (element.parent().hasClass('custom-control')) {
+        element.parent().parent().append(error);
       } else {
-        sessionStorage.setItem('notice', save.data('notice') ? save.data('notice') : 0);
-        window.location = $('#btn-list-back').attr('href');
+        element.parent().append(error);
       }
-    }).fail(function (jqXHR, textStatus, errorThrown) {
-      showError('無効なリクエストです。');
-    }).always(function (jqXHR, textStatus, errorThrown) {
-      save.attr('disabled', false);
-    });
-  }
-});
+    },
+    highlight: function (element, errorClass, validClass) {
+      if (element.type === 'checkbox' || element.type === 'radio') {
+        this.findByName(element.name).addClass('is-invalid');
+      } else {
+        $(element).addClass('is-invalid');
+      }
+    },
+    unhighlight: function (element, errorClass, validClass) {
+      if (element.type === 'checkbox' || element.type === 'radio') {
+        this.findByName(element.name).removeClass('is-invalid');
+      } else {
+        $(element).removeClass('is-invalid');
+      }
+    },
+    submitHandler: function (form) {
+      let validator = this;
+      let save = $('#btn-save');
+      save.attr('disabled', true);
+
+      $.ajax({
+        processData: false,
+        contentType: false,
+        url: form.action,
+        data: new FormData(form),
+        method: 'POST',
+      })
+        .done(function (data) {
+          // If successful
+          if (!$.isEmptyObject(data.errors)) {
+            showError(data.errors);
+          } else {
+            sessionStorage.setItem('notice', save.data('notice') ? save.data('notice') : 0);
+            window.location = $('#btn-list-back').attr('href');
+          }
+        })
+        .fail(function (jqXHR, textStatus, errorThrown) {
+          showError('無効なリクエストです。');
+        })
+        .always(function (jqXHR, textStatus, errorThrown) {
+          save.attr('disabled', false);
+        });
+    },
+  });
 $('#detail-form').validate();
 
 $('#btn-copy').click(function (e) {
@@ -435,21 +557,24 @@ $('#btn-copy').click(function (e) {
   showSuccess('複製画面に移動しました');
 });
 
-$('#btn-del').click(function () {
-  $('#del-modal').modal('hide');
-  $.ajax({
-    method: 'DELETE'
-  }).done(function (data) {
-    // If successful
-    if (!$.isEmptyObject(data.errors)) {
-      showError(data.errors);
-    } else {
-      sessionStorage.setItem('notice', 3);
-      window.location = $('#btn-list-back').attr('href');
-    }
-  }).fail(function (jqXHR, textStatus, errorThrown) {
-    showError('無効なリクエストです。');
-  });
+$('#btn-del').click(async function () {
+  if (await showConfirm('選択したデータを削除します。')) {
+    $.ajax({
+      method: 'DELETE',
+    })
+      .done(function (data) {
+        // If successful
+        if (!$.isEmptyObject(data.errors)) {
+          showError(data.errors);
+        } else {
+          sessionStorage.setItem('notice', 3);
+          window.location = $('#btn-list-back').attr('href');
+        }
+      })
+      .fail(function (jqXHR, textStatus, errorThrown) {
+        showError('無効なリクエストです。');
+      });
+  }
 });
 
 // CSRF security
@@ -458,7 +583,7 @@ $.ajaxSetup({
     if (setting.type != 'GET') {
       xhr.setRequestHeader('X-XSRF-TOKEN', getCsrf());
     }
-  }
+  },
 });
 
 function showSuccess(title, body) {
@@ -477,7 +602,7 @@ function showError(errors) {
     title: 'エラー',
     autohide: true,
     delay: 5000,
-    body: typeof errors === 'object' ? Object.values(errors).join('<br>') : errors
+    body: typeof errors === 'object' ? Object.values(errors).join('<br>') : errors,
   });
 }
 
