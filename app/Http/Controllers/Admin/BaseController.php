@@ -20,7 +20,7 @@ class BaseController extends Controller
     $this->middleware(function ($request, $next) {
       $auth = Auth::guard('admin');
       if (!$auth->check()) {
-        return redirect()->route('admin.guard.login', ['ref' => $request->getRequestUri()])->send();
+        return redirect('admin/guard/login?ref=' . $request->getRequestUri())->send();
       }
 
       $admin = $auth->user();
