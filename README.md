@@ -11,6 +11,11 @@
 - composer run-script post-root-package-install
 - composer run-script post-create-project-cmd
 
+## Local database
+
+- php artisan migrate
+- php artisan db:seed
+
 ## Local queue (for import csv...)
 
 - php artisan queue:listen

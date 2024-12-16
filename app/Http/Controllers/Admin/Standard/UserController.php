@@ -6,6 +6,7 @@ use App\Http\Controllers\Admin\BaseController;
 use Exception;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
@@ -68,7 +69,7 @@ class UserController extends BaseController
   public function getDetail($id = null)
   {
     $detail = [
-      'id' => '', 'name' => '', 'email' => '', 'tel' => '',
+      'id' => '', 'name' => '', 'email' => '', 'tel' => '', 'app_api_url'=>'', 'api_password'=>'',
       'zip' => '', 'prefecture' => '', 'address' => '', 'address_other' => '',
     ];
 

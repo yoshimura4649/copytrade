@@ -557,24 +557,23 @@ $('#btn-copy').click(function (e) {
   showSuccess('複製画面に移動しました');
 });
 
-$('#btn-del').click(async function () {
-  if (await showConfirm('選択したデータを削除します。')) {
-    $.ajax({
-      method: 'DELETE',
+$('#btn-del').click(function () {
+  $('#del-modal').modal('hide');
+  $.ajax({
+    method: 'DELETE',
+  })
+    .done(function (data) {
+      // If successful
+      if (!$.isEmptyObject(data.errors)) {
+        showError(data.errors);
+      } else {
+        sessionStorage.setItem('notice', 3);
+        window.location = $('#btn-list-back').attr('href');
+      }
     })
-      .done(function (data) {
-        // If successful
-        if (!$.isEmptyObject(data.errors)) {
-          showError(data.errors);
-        } else {
-          sessionStorage.setItem('notice', 3);
-          window.location = $('#btn-list-back').attr('href');
-        }
-      })
-      .fail(function (jqXHR, textStatus, errorThrown) {
-        showError('無効なリクエストです。');
-      });
-  }
+    .fail(function (jqXHR, textStatus, errorThrown) {
+      showError('無効なリクエストです。');
+    });
 });
 
 // CSRF security

@@ -46,12 +46,22 @@
             <label for="address_other">建物名</label>
             <input value="<?php echo isset($detail['address_other']) ? $detail['address_other'] : '' ?>" type="text" name="address_other" class="form-control" id="address_other">
           </div>
-        </div>
-        <div class="col-md-6">
           <div class="form-group">
             <label for="email">電話番号</label>
             <span class="float-right badge badge-danger">必須</span>
             <input value="<?php echo $detail['tel']; ?>" type="tel" name="tel" class="form-control" placeholder="例：12345678901" id="tel" required>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="form-group">
+            <label for="app_api_url">アプリのAPI URL</label>
+            <span class="float-right badge badge-danger">必須</span>
+            <input value="<?php echo $detail['app_api_url']; ?>" type="text" name="app_api_url" class="form-control" id="app_api_url" required>
+          </div>
+          <div class="form-group">
+            <label for="api_password">APIパスワード</label>
+            <span class="float-right badge badge-danger">必須</span>
+            <input value="<?php echo $detail['api_password']; ?>" type="password" name="api_password" class="form-control" id="api_password" required>
           </div>
           <div class="form-group">
             <label for="email">メールアドレス</label>
