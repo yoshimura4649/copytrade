@@ -2,6 +2,7 @@
 
 namespace App\Jobs;
 
+use Exception;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -28,9 +29,6 @@ class UpdateTokens implements ShouldQueue
   public function handle(): void
   {
     try {
-      // Begin a database transaction
-      DB::beginTransaction();
-
       // Retrieve all users
       $users = DB::table('users')->get();
 
@@ -57,15 +55,9 @@ class UpdateTokens implements ShouldQueue
           ]);
         }
       }
-
-      // Commit the transaction
-      DB::commit();
-    } catch (\Throwable $th) {
+    } catch (Exception $e) {
       // Log the error
-      Log::error('UpdateTokens Error: ' . $th->__toString());
-
-      // Rollback the transaction in case of an error
-      DB::rollBack();
+      Log::error('UpdateTokens Error: ' . $e->getMessage());
     }
   }
 
