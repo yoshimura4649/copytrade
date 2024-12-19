@@ -54,4 +54,16 @@ class User extends Authenticatable
       ->where('transaction_status', TransactionStatus::Active)
       ->get();
   }
+
+  /**
+   * Check if the transaction is active.
+   */
+  public static function is_active($id)
+  {
+    $transactionStatus = DB::table('users')
+      ->where('id', $id)
+      ->value('transaction_status');
+
+    return $transactionStatus === TransactionStatus::Active->value;
+  }
 }

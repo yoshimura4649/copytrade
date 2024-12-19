@@ -6,6 +6,7 @@ use App\Http\Controllers\Admin\GuardController;
 use App\Http\Controllers\Admin\Requirement\SetupController;
 use App\Http\Controllers\Admin\Standard\HomeController;
 use App\Http\Controllers\Admin\Standard\ModeratorController;
+use App\Http\Controllers\Admin\Standard\OrderController;
 use App\Http\Controllers\Admin\Standard\UserController;
 use App\Http\Controllers\Frontend\AccountController;
 use App\Http\Controllers\Frontend\AuthController;

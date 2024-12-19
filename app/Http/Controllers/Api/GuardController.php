@@ -2,21 +2,21 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Models\User;
+use App\Services\EmailService;
+use Exception;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
-use App\Models\User;
-use App\Myemail;
-use Exception;
 
 class GuardController extends BaseController
 {
   /**
-   * CORE-API-01 ログイン・トークン取得API
+   * CORE-API-01 ログイン・トークン取得API.
    */
   public function postLogin(Request $request)
   {
@@ -50,12 +50,12 @@ class GuardController extends BaseController
   }
 
   /**
-   * CORE-API-02 パスワード変更
+   * CORE-API-02 パスワード変更.
    */
   public function postChangePassword(Request $request)
   {
     $validator = Validator::make($request->post(), [
-      'old_password' => ['required', 'string' ,'min:8', 'max:32'],
+      'old_password' => ['required', 'string', 'min:8', 'max:32'],
       'new_password' => ['required', 'string', 'min:8', 'max:32'],
     ]);
 
@@ -83,7 +83,7 @@ class GuardController extends BaseController
   }
 
   /**
-   * CORE-API-03 ログアウト
+   * CORE-API-03 ログアウト.
    */
   public function getLogout(Request $request)
   {
@@ -106,7 +106,7 @@ class GuardController extends BaseController
     }
 
     $validator = Validator::make($request->post(), [
-      'email' => ['required', 'string', 'email']
+      'email' => ['required', 'string', 'email'],
     ]);
 
     // バリデーション
@@ -135,10 +135,10 @@ class GuardController extends BaseController
         'token' => $token,
       ]);
 
-      $user['url'] = url('/') . "/reset_password/?token=" . $token;
+      $user['url'] = url('/') . '/reset_password/?token=' . $token;
 
       // パスワードリセットURLをメールで送信
-      Myemail::user($user, 2);
+      EmailService::user($user, 2);
 
       DB::commit();
     } catch (Exception $e) {
@@ -153,7 +153,7 @@ class GuardController extends BaseController
   }
 
   /**
-   * CORE-API-05 パスワード忘れでパスワード再設定を行う
+   * CORE-API-05 パスワード忘れでパスワード再設定を行う.
    *
    * パスワード忘れでCORE-API-04をコールした後、システムからリセットパスワードリンクを送る。
    * 本APIはパスワードを再設定する時利用される
@@ -199,7 +199,7 @@ class GuardController extends BaseController
         ->delete();
 
       // ユーザーに通知メール送信
-      Myemail::user($user, 3);
+      EmailService::user($user, 3);
 
       DB::commit();
     } catch (Exception $e) {
@@ -214,15 +214,14 @@ class GuardController extends BaseController
   }
 
   /**
-   * CORE-API-06 ユーザー登録API
-   *
+   * CORE-API-06 ユーザー登録API.
    */
   public function postRegister(Request $request)
   {
     $validator = Validator::make($request->post(), [
       'name' => ['required', 'string', 'max:255'],
       'email' => ['required', 'string', 'email', 'unique:users'],
-      'password' => ['required', 'string', 'min:8', 'max:32']
+      'password' => ['required', 'string', 'min:8', 'max:32'],
     ]);
 
     // バリデーション

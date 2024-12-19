@@ -2,7 +2,10 @@
 
 namespace App\Http\Controllers\Admin\Standard;
 
+use App\Enums\TransactionStatus;
 use App\Http\Controllers\Admin\BaseController;
+use App\Models\User;
+use Carbon\Carbon;
 use Exception;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -100,6 +103,10 @@ class UserController extends BaseController
           throw new Exception('このメールアドレスは利用できません。', 1);
         }
 
+        if ($input['transaction_status'] == TransactionStatus::Active->value) {
+          $input['transaction_updated_at'] = Carbon::now();
+        }
+
         DB::table('users')->insert(['password' => Hash::make($input['password'] ?: Str::random(16))] + $input);
       } else {
         $validator = Validator::make($input, [
@@ -114,6 +121,10 @@ class UserController extends BaseController
           $input['password'] = Hash::make($input['password']);
         } else {
           unset($input['password']);
+        }
+
+        if (!User::is_active($id) && $input['transaction_status'] == TransactionStatus::Active->value) {
+          $input['transaction_updated_at'] = Carbon::now();
         }
 
         DB::table('users')
