@@ -86,6 +86,9 @@ Route::group(['prefix' => 'admin'], function () {
   Route::get('standard/user/copy/{id}', [UserController::class, 'getCopy']);
   Route::post('standard/user/copy/{id}', [UserController::class, 'postCopy']);
 
+  Route::get('standard/order/list', [OrderController::class, 'getList']);
+  Route::get('standard/order/detail/{id}', [OrderController::class, 'getDetail']);
+
   Route::get('email/inquiry/list', [InquiryController::class, 'getList']);
   Route::get('email/inquiry/detail/{id}', [InquiryController::class, 'getDetail']);
   Route::post('email/inquiry/detail/{id}', [InquiryController::class, 'postDetail']);

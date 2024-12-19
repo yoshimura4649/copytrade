@@ -141,10 +141,10 @@
               </a>
             </li>
             <li class="nav-item">
-              <a href="/admin/email/inquiry/list" class="nav-link">
-                <i class="nav-icon fas fa-headset"></i>
+              <a href="/admin/standard/order/list" class="nav-link">
+                <i class="nav-icon fas fa-shopping-cart"></i>
                 <p>
-                  お問い合わせ
+                  発注管理
                 </p>
               </a>
             </li>
