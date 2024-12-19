@@ -7,7 +7,7 @@
     $user = Auth::user();
     $transactionStatus = $user->transaction_status == TransactionStatus::Active->value;
     $expirationDate = $user->transaction_updated_at ? Carbon::parse($user->transaction_updated_at)->addMonth() : null;
-    $buttonEnabled = abs($expirationDate->diffInDays(Carbon::now())) <= 7 ? true : false;
+    $buttonEnabled = !$expirationDate || abs($expirationDate->diffInDays(Carbon::now())) <= 7 ? true : false;
   @endphp
   <div class="col-md-12 m-auto">
     <div class="card card-warning card-outline">
