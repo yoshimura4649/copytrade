@@ -1,13 +1,17 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Admin\Email\InquiryController;
+use App\Http\Controllers\Admin\Email\TemplateController;
 use App\Http\Controllers\Admin\GuardController;
+use App\Http\Controllers\Admin\Requirement\SetupController;
 use App\Http\Controllers\Admin\Standard\HomeController;
 use App\Http\Controllers\Admin\Standard\ModeratorController;
 use App\Http\Controllers\Admin\Standard\UserController;
-use App\Http\Controllers\Admin\Email\InquiryController;
-use App\Http\Controllers\Admin\Email\TemplateController;
-use App\Http\Controllers\Admin\Requirement\SetupController;
+use App\Http\Controllers\Frontend\AccountController;
+use App\Http\Controllers\Frontend\AuthController;
+use App\Http\Controllers\Frontend\RegisterController;
+use App\Http\Controllers\Frontend\TransactionController;
+use Illuminate\Support\Facades\Route;
 
 /*
 |--------------------------------------------------------------------------
@@ -20,8 +24,36 @@ use App\Http\Controllers\Admin\Requirement\SetupController;
 |
 */
 
-Route::get('/', function () {
-  return view('welcome');
+// Register
+Route::group(['prefix' => 'register'], function () {
+  Route::match(['get', 'post'], '/', [RegisterController::class, 'actionRegister'])->name('register');
+  Route::post('/confirm', [RegisterController::class, 'postRegisterConfirm'])->name('register_confirm');
+  Route::get('/complete', [RegisterController::class, 'getRegisterComplete'])->name('register_complete');
+});
+
+// Login - Logout
+Route::match(['get', 'post'], 'login', [AuthController::class, 'actionLogin'])->name('login');
+Route::get('logout', [AuthController::class, 'getLogout'])->name('logout');
+
+// Reset Password
+Route::match(['get', 'post'], 'forgot_password', [AuthController::class, 'actionForgotPassword'])->name('forgot_password');
+Route::get('forgot_password/complete', [AuthController::class, 'getForgotPasswordComplete'])->name('forgot_password.complete');
+Route::match(['get', 'post'], 'reset_password', [AuthController::class, 'actionResetPassword'])->name('reset_password');
+Route::get('reset_password/complete', [AuthController::class, 'getResetPasswordComplete'])->name('reset_password.complete');
+
+// Mypage Fronted
+Route::group(['middleware' => ['auth:web'], 'prefix' => '/mypage'], function () {
+  Route::get('', function () {
+    return view('frontend.index');
+  })->name('mypage');
+
+  Route::match(['get', 'post'], 'account', [AccountController::class, 'actionAccount'])->name('account');
+
+  // Transaction
+  Route::get('transaction/history/list', [TransactionController::class, 'getList'])->name('transaction_history_list');
+  Route::get('transaction/history/detail/{id}', [TransactionController::class, 'getDetail'])->name('transaction_history_detail');
+  Route::post('transaction/history/detail/{id}', [TransactionController::class, 'postDetail'])->name('transaction_history_detail');
+  Route::match(['get', 'post'], 'transaction/setting', [TransactionController::class, 'actionSetting'])->name('transaction_setting');
 });
 
 /*
@@ -29,7 +61,7 @@ Route::get('/', function () {
 | Admin Routes
 |--------------------------------------------------------------------------
 */
-Route::match(['get', 'post'], 'admin/guard/login',[GuardController::class, 'actionLogin']);
+Route::match(['get', 'post'], 'admin/guard/login', [GuardController::class, 'actionLogin']);
 Route::get('admin/guard/logout', [GuardController::class, 'getLogout']);
 
 Route::group(['prefix' => 'admin'], function () {

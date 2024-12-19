@@ -159,7 +159,7 @@ return [
     */
 
   'aliases' => Facade::defaultAliases()->merge([
-    // 'ExampleClass' => App\Example\ExampleClass::class,
+    'TransactionStatus' => App\Enums\TransactionStatus::class,
   ])->toArray(),
 
 ];
