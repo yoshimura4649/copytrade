@@ -2,6 +2,7 @@
 
 namespace App\Jobs;
 
+use App\Models\User;
 use Exception;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -30,7 +31,7 @@ class UpdateTokens implements ShouldQueue
   {
     try {
       // Retrieve all users
-      $users = DB::table('users')->get();
+      $users = User::get_users_active();
 
       // Iterate over each user to send POST requests and update tokens
       foreach ($users as $user) {

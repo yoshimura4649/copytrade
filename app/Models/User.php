@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\TransactionStatus;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -47,10 +48,10 @@ class User extends Authenticatable
     'email_verified_at' => 'datetime',
   ];
 
-  public static function get_app_api_url()
+  public static function get_users_active()
   {
     return DB::table('users')
-      ->select('id', 'app_api_url', 'token')
+      ->where('transaction_status', TransactionStatus::Active)
       ->get();
   }
 }

@@ -42,7 +42,7 @@ class SendUserTradeOrder implements ShouldQueue
       return;
     }
 
-    $users = User::get_app_api_url();
+    $users = User::get_users_active();
 
     $validated = $this->validateItems($this->items);
     if (!$validated) {

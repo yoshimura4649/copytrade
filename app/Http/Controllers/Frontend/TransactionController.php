@@ -33,7 +33,7 @@ class TransactionController extends Controller
     if ($request->isMethod('post')) {
       try {
         $updateData = [
-          'transaction_status' => TransactionStatus::active,
+          'transaction_status' => TransactionStatus::Active,
           'transaction_updated_at' => Carbon::now('Asia/Tokyo')->toDateTimeString(),
         ];
 

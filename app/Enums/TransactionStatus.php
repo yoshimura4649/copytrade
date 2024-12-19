@@ -7,6 +7,17 @@ namespace App\Enums;
  */
 enum TransactionStatus: int
 {
-  case active = 1;
-  case inactive = 0;
+  case Active = 1;    // アクティブ
+  case Inactive = 0;  // 非アクティブ
+
+  /**
+   * Get the label for the enum value.
+   */
+  public function label(): string
+  {
+    return match ($this) {
+      self::Active => 'アクティブ',        // Active
+      self::Inactive => '非アクティブ',    // Inactive
+    };
+  }
 }

@@ -69,8 +69,8 @@ class UserController extends BaseController
   public function getDetail($id = null)
   {
     $detail = [
-      'id' => '', 'name' => '', 'email' => '', 'tel' => '', 'app_api_url'=>'', 'api_password'=>'',
-      'zip' => '', 'prefecture' => '', 'address' => '', 'address_other' => '',
+      'id' => '', 'name' => '', 'email' => '', 'tel' => '',
+      'app_api_url'=>'', 'api_password'=>'', 'transaction_status' => '',
     ];
 
     if (is_numeric($id)) {
